@@ -13,8 +13,8 @@ const geistMono = Geist_Mono({
 })
 
 export const metadata: Metadata = {
-  title: "Ethereum Calldata Decoder",
-  description: "Decode Ethereum Calldata As Easy As We Go",
+  title: "Ethereum Calldata Parser",
+  description: "Parse Ethereum Calldata As Easy As We Go",
 }
 
 export default function RootLayout({
