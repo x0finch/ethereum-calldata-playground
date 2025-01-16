@@ -1,3 +1,4 @@
+import { DemoTree } from "./demo-tree"
 import { ParsedTree, TreeNodeProps } from "./parsed-node-tree"
 
 const FAKE_CALLDATA =
@@ -55,12 +56,14 @@ const FAKE_PARSED: TreeNodeProps = {
 }
 
 export function Panel() {
+  // <div className="overflow-auto max-h-[60vh]"></div>
   return (
-    <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow">
+    <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow overflow-auto pb-10">
       <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
         {FAKE_CALLDATA}
       </div>
-      <ParsedTree root={FAKE_PARSED} />
+      {/* <ParsedTree root={FAKE_PARSED} /> */}
+      <DemoTree />
     </div>
   )
 }

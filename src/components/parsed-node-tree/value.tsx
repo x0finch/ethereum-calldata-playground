@@ -13,7 +13,7 @@ function NodeValue$Filed({ type, name, value }: TreeNodeProps) {
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
-      <span className="mr-2 max-w-5xl overflow-hidden text-ellipsis">
+      <span className="mr-2 max-w-lg overflow-hidden text-ellipsis">
         {value}
       </span>
       <span className="text-sm bg-gray-200 rounded px-1">{type}</span>
