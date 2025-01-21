@@ -1,5 +1,7 @@
 "use client"
 
+import { generateUUID } from "@/lib/utils"
+import { useHistory } from "@/store/history"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@shadcn/components/ui/button"
 import {
@@ -10,7 +12,7 @@ import {
   FormMessage,
 } from "@shadcn/components/ui/form"
 import { Input } from "@shadcn/components/ui/input"
-import { usePathname, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
@@ -21,9 +23,10 @@ const formSchema = z.object({
   }),
 })
 
-export function SearchingInput({}: { handleSubmit?: (text: string) => void }) {
+export function SearchingInput() {
+  const { addHistory } = useHistory()
+
   const router = useRouter()
-  const pathname = usePathname()
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -34,8 +37,15 @@ export function SearchingInput({}: { handleSubmit?: (text: string) => void }) {
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     const { search } = values
-    router.push(`${pathname}?q=${search}`)
-    form.reset()
+
+    const id = generateUUID()
+    addHistory({
+      id,
+      data: search,
+      createdAt: Date.now(),
+    })
+
+    router.push(`/${id}`)
   }
 
   return (
