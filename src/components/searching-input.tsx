@@ -45,7 +45,7 @@ export function SearchingInput() {
       createdAt: Date.now(),
     })
 
-    router.push(`/${id}`)
+    router.push(`/calldata/${id}`)
   }
 
   return (
