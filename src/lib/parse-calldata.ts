@@ -1,7 +1,7 @@
 import { TreeNodeProps } from "@/components/parsed-node-tree"
 import { decodeFunctionData, getAbiItem, Hex, Abi, AbiParameter } from "viem"
 
-const METHOD_ID_LENGTH = 10 // include 0x prefix
+export const METHOD_ID_LENGTH = 10 // include 0x prefix
 
 export function parseCalldata(
   abi: Abi,

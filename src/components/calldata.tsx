@@ -1,7 +1,7 @@
 "use client"
 
 import { useHistory } from "@/store/history"
-import { ConnectedTree } from "./connected-tree"
+import { ContinueParsing } from "./continue-parsing"
 
 export function Calldata({ id }: { id: string }) {
   const { history } = useHistory()
@@ -18,7 +18,7 @@ export function Calldata({ id }: { id: string }) {
       <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
         {data}
       </div>
-      <ConnectedTree data={data} />
+      <ContinueParsing data={data} onDataChnage={console.log} />
     </div>
   )
 }

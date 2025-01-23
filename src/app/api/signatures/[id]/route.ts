@@ -1,5 +1,5 @@
-export async function GET(_: Request, { params }: { params: { id: string } }) {
-  const { id } = params
+export async function GET(_: Request, { params }: { params: Promise<{ id: string }> }) {
+  const { id } = await params
   const functions = await proxyToOpenChain(id as string)
 
   if (!functions.length) {
