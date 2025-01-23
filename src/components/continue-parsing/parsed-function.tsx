@@ -35,11 +35,11 @@ function FunctionRow({ name }: Pick<ParsedFunctionProps, "name">) {
   )
 }
 
-function StringParamRow({
+function SimpleParamRow({
   name,
   value,
   type,
-}: ParsedFunctionProps["params"][0] & { value: string }) {
+}: ParsedFunctionProps["params"][0]) {
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
@@ -58,15 +58,14 @@ function ParamRow({
   children,
 }: ParsedFunctionProps["params"][0]) {
   if (!children) {
-    return <StringParamRow name={name} value={value} type={type} />
+    return <SimpleParamRow name={name} value={value} type={type} />
   }
 
-  // check children is ReactNode
   const isReactNode = isValidElement(children)
 
   return (
     <SimpleTree
-      parent={<StringParamRow name={name} value={value} type={type} />}
+      parent={<SimpleParamRow name={name} value={value} type={type} />}
     >
       {isReactNode ? (
         <li>{children}</li>
@@ -111,7 +110,7 @@ function SimpleTree({
 
   return (
     <ul>
-      <li className={cn("flex items-center cursor-default")}>
+      <li className="flex items-center cursor-default">
         <Chevron isOpen={isOpen} onClick={toggleOpen} />
         {parent}
       </li>
