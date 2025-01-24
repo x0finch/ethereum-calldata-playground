@@ -18,7 +18,7 @@ export function Calldata({ id }: { id: string }) {
       <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
         {data}
       </div>
-      <ContinueParsing data={data} onDataChnage={console.log} />
+      <ContinueParsing data={data} />
     </div>
   )
 }

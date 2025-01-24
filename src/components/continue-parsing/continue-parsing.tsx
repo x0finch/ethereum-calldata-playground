@@ -1,25 +1,20 @@
 import useSWR from "swr"
-import { ParsedFunction } from "./parsed-function"
-import { METHOD_ID_LENGTH } from "@/lib/parse-calldata"
+import { FunctionDetail, FunctionDetailProps } from "./function-detail"
+import {
+  METHOD_ID_LENGTH,
+  parseCallData,
+  ParsedCalldata,
+} from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
 import { useMemo } from "react"
-import {
-  Abi,
-  AbiFunction,
-  AbiParameter,
-  decodeFunctionData,
-  getAbiItem,
-  Hex,
-  parseAbi,
-} from "viem"
+import { Abi, parseAbi } from "viem"
 import { ParsingSkeleton } from "./parsing-skeleton"
 
 interface ContinueParsingProps {
   data: string
-  onDataChnage: (data: string) => void
 }
 
-export function ContinueParsing({ data, onDataChnage }: ContinueParsingProps) {
+export function ContinueParsing({ data }: ContinueParsingProps) {
   const signature = data.slice(0, METHOD_ID_LENGTH)
 
   const { data: functions, isLoading } = useSWR<string[]>(
@@ -27,69 +22,59 @@ export function ContinueParsing({ data, onDataChnage }: ContinueParsingProps) {
     fetcher
   )
 
-  const parsedData = useMemo(
-    () => parseCallData(data, functions),
-    [data, functions]
-  )
+  const [detail] = useMemo(() => {
+    if (!functions?.length) {
+      return [null, null]
+    }
+
+    try {
+      const func = `function ${functions[0]}`
+      const abi = parseAbi([func]) as Abi
+      const detail = parseCallData(data, abi)
+
+      return [detail, null]
+    } catch (error) {
+      return [null, error]
+    }
+  }, [data, functions])
+
+  const wrappedDetail = useMemo(() => {
+    if (!detail) {
+      return null
+    }
+
+    return {
+      ...detail,
+      params: detail.params.map(wrapParam),
+    }
+  }, [detail])
 
   if (isLoading) {
     return <ParsingSkeleton />
   }
 
-  if (!functions?.length || !parsedData) {
+  if (!wrappedDetail) {
     return null
   }
 
-  return <ParsedFunction {...parsedData} />
+  console.log("wrappedDetail: ", wrappedDetail)
+
+  return <FunctionDetail {...wrappedDetail} />
 }
 
-function parseCallData(data: string, functions: string[] | undefined) {
-  if (!functions?.length) {
-    return null
+function wrapParam(
+  param: ParsedCalldata["params"][0]
+): FunctionDetailProps["params"][0] {
+  if (param.children) {
+    const children = param.children.map(wrapParam)
+    return { ...param, children }
   }
 
-  const firstFunction = `function ${functions[0]}`
-  const abi = parseAbi([firstFunction]) as Abi[]
-  const parsed = decodeFunctionData({ abi, data: data as Hex })
-  const abiItem = getAbiItem({ abi, name: parsed.functionName }) as AbiFunction
+  const maybeIsSubCallData =
+    param.type === "bytes" &&
+    param.value.startsWith("0x") &&
+    param.value.length > METHOD_ID_LENGTH
 
-  return {
-    name: parsed.functionName,
-    params: abiItem.inputs.map(
-      ({ name: nameOrEmpty, type, ...rest }, index) => {
-        const name = nameOrEmpty ?? `${index}`
-        const value = parsed.args?.[index]
-
-        if (!Array.isArray(value)) {
-          return { name, type, value: `${value}` }
-        }
-
-        return {
-          name,
-          type,
-          value: "",
-          children: value.map((v, index) => {
-            const subType = type.startsWith("tuple")
-              ? ((rest as any)["components"] as AbiParameter[])[index].type
-              : type.replace("[]", "")
-            const maybeIsFunction =
-              subType === "bytes" &&
-              typeof v === "string" &&
-              v.startsWith("0x") &&
-              v.length >= METHOD_ID_LENGTH
-            const value = `${v}`
-
-            return {
-              name: `${index}`,
-              type: subType,
-              value,
-              children: maybeIsFunction ? (
-                <ContinueParsing data={value} onDataChnage={console.log} />
-              ) : null,
-            }
-          }),
-        }
-      }
-    ),
-  }
+  const children = <ContinueParsing data={param.value} />
+  return { ...param, children: maybeIsSubCallData ? children : undefined }
 }

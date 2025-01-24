@@ -9,12 +9,12 @@ interface Param {
   children?: ReactNode | Param[]
 }
 
-interface ParsedFunctionProps {
+export interface FunctionDetailProps {
   name: string
   params: Param[]
 }
 
-export function ParsedFunction({ name, params }: ParsedFunctionProps) {
+export function FunctionDetail({ name, params }: FunctionDetailProps) {
   return (
     <SimpleTree parent={<FunctionRow name={name} />}>
       {params.map((param, index) => (
@@ -26,7 +26,7 @@ export function ParsedFunction({ name, params }: ParsedFunctionProps) {
   )
 }
 
-function FunctionRow({ name }: Pick<ParsedFunctionProps, "name">) {
+function FunctionRow({ name }: Pick<FunctionDetailProps, "name">) {
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name}</span>
@@ -39,7 +39,7 @@ function SimpleParamRow({
   name,
   value,
   type,
-}: ParsedFunctionProps["params"][0]) {
+}: FunctionDetailProps["params"][0]) {
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
@@ -56,7 +56,7 @@ function ParamRow({
   value,
   type,
   children,
-}: ParsedFunctionProps["params"][0]) {
+}: FunctionDetailProps["params"][0]) {
   if (!children) {
     return <SimpleParamRow name={name} value={value} type={type} />
   }

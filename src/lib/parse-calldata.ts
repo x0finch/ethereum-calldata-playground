@@ -1,87 +1,67 @@
-import { TreeNodeProps } from "@/components/parsed-node-tree"
-import { decodeFunctionData, getAbiItem, Hex, Abi, AbiParameter } from "viem"
+import {
+  decodeFunctionData,
+  getAbiItem,
+  Hex,
+  Abi,
+  AbiParameter,
+  AbiFunction,
+  DecodeFunctionDataReturnType,
+} from "viem"
 
 export const METHOD_ID_LENGTH = 10 // include 0x prefix
 
-export function parseCalldata(
-  abi: Abi,
-  calldata: Hex
-): TreeNodeProps | undefined {
-  const methodId = calldata.slice(0, METHOD_ID_LENGTH)
-  if (methodId.length < METHOD_ID_LENGTH) {
-    return undefined
-  }
+interface Param {
+  name: string
+  value: string
+  type: string
+  children?: Param[]
+}
 
-  const abiItem = getAbiItem({ abi, name: methodId })
-  if (!abiItem || abiItem.type !== "function") {
-    return undefined
-  }
+export interface ParsedCalldata {
+  name: string
+  params: Param[]
+}
 
-  type DecodeFunctionDataReturnType = ReturnType<typeof decodeFunctionData>
-  let parsed: DecodeFunctionDataReturnType
-
-  try {
-    parsed = decodeFunctionData({
-      abi,
-      data: calldata,
-    }) as DecodeFunctionDataReturnType
-  } catch {
-    return undefined
-  }
-
-  const functionName = parsed.functionName
-
-  const nodes: TreeNodeProps["nodes"] = abiItem.inputs.map(
-    ({ name, type, ...rest }, index) => {
-      const value = parsed.args?.[index]
-
-      if (!Array.isArray(value)) {
-        const node =
-          type === "bytes" &&
-          typeof value === "string" &&
-          value.startsWith("0x")
-            ? parseCalldata(abi, value as Hex)
-            : undefined
-
-        return {
-          variant: "field",
-          name: name ?? `${index}`,
-          type,
-          value: `${value}`,
-          nodes: node ? [node] : undefined,
-        }
-      }
-
-      return {
-        variant: "field",
-        name: name ?? `${index}`,
-        type,
-        value: "",
-        nodes: value.map((v, index) => {
-          const subType = type.startsWith("tuple")
-            ? ((rest as any)["components"] as AbiParameter[])[index].type
-            : type.replace("[]", "")
-
-          const sub =
-            subType === "bytes" && typeof v === "string" && v.startsWith("0x")
-              ? parseCalldata(abi, v as Hex)
-              : undefined
-
-          return {
-            variant: "field",
-            name: `${index}`,
-            type: subType,
-            value: `${v}`,
-            nodes: sub ? [sub] : undefined,
-          }
-        }),
-      }
-    }
-  )
+export function parseCallData(data: string, abi: Abi): ParsedCalldata {
+  const parsed = decodeFunctionData({ abi, data: data as Hex })
+  const abiItem = getAbiItem({ abi, name: parsed.functionName }) as AbiFunction
 
   return {
-    variant: "function",
-    value: functionName,
-    nodes,
+    name: parsed.functionName,
+    params: abiItem.inputs.map((param, index) =>
+      parseAbiParameter(param, index, parsed)
+    ),
+  }
+}
+
+function parseAbiParameter(
+  param: AbiParameter,
+  index: number,
+  parsed: DecodeFunctionDataReturnType<Abi>
+): Param {
+  const { type } = param
+  const name = param.name ?? `${index}`
+  const value = parsed.args?.[index] ?? null
+
+  if (!Array.isArray(value)) {
+    return { name, type, value: `${value}` }
+  }
+
+  return {
+    name,
+    type,
+    value: "",
+    children: value.map((v, index) => {
+      const subType = type.startsWith("tuple")
+        ? ((param as any)["components"] as AbiParameter[])?.[index]?.type
+        : type.replace("[]", "")
+      const value = `${v}`
+
+      return {
+        name: `${index}`,
+        type: subType ?? "unknown",
+        value,
+      }
+    }),
   }
 }
