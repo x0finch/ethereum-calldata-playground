@@ -8,7 +8,7 @@ import {
   DecodeFunctionDataReturnType,
 } from "viem"
 
-export const METHOD_ID_LENGTH = 10 // include 0x prefix
+export const SELECTOR_LENGTH = 10 // include 0x prefix
 
 interface Param {
   name: string

@@ -1,7 +1,7 @@
 import useSWR from "swr"
 import { FunctionDetail, FunctionDetailProps } from "./function-detail"
 import {
-  METHOD_ID_LENGTH as SELECTOR_LENGTH,
+  SELECTOR_LENGTH,
   parseCallData,
   ParsedCalldata,
 } from "@/lib/parse-calldata"
