@@ -1,7 +1,7 @@
 import useSWR from "swr"
 import { FunctionDetail, FunctionDetailProps } from "./function-detail"
 import {
-  METHOD_ID_LENGTH,
+  METHOD_ID_LENGTH as SELECTOR_LENGTH,
   parseCallData,
   ParsedCalldata,
 } from "@/lib/parse-calldata"
@@ -15,10 +15,10 @@ interface ContinueParsingProps {
 }
 
 export function ContinueParsing({ data }: ContinueParsingProps) {
-  const signature = data.slice(0, METHOD_ID_LENGTH)
+  const selector = data.slice(0, SELECTOR_LENGTH)
 
   const { data: functions, isLoading } = useSWR<string[]>(
-    `/api/signatures/${signature}`,
+    `/api/selectors/${selector}`,
     fetcher
   )
 
@@ -73,7 +73,7 @@ function wrapParam(
   const maybeIsSubCallData =
     param.type === "bytes" &&
     param.value.startsWith("0x") &&
-    param.value.length > METHOD_ID_LENGTH
+    param.value.length > SELECTOR_LENGTH
 
   const children = <ContinueParsing data={param.value} />
   return { ...param, children: maybeIsSubCallData ? children : undefined }
