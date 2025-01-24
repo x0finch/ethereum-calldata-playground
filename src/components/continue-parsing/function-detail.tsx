@@ -16,13 +16,15 @@ export interface FunctionDetailProps {
 
 export function FunctionDetail({ name, params }: FunctionDetailProps) {
   return (
-    <SimpleTree parent={<FunctionRow name={name} />}>
-      {params.map((param, index) => (
-        <li key={index}>
-          <ParamRow {...param} />
-        </li>
-      ))}
-    </SimpleTree>
+    <div className="ml-5">
+      <SimpleTree parent={<FunctionRow name={name} />}>
+        {params.map((param, index) => (
+          <li key={index}>
+            <ParamRow {...param} />
+          </li>
+        ))}
+      </SimpleTree>
+    </div>
   )
 }
 
@@ -110,11 +112,11 @@ function SimpleTree({
 
   return (
     <ul>
-      <li className="flex items-center cursor-default">
+      <li className="flex items-center cursor-default -ml-5">
         <Chevron isOpen={isOpen} onClick={toggleOpen} />
         {parent}
       </li>
-      {isOpen && <ul className="mt-1 ml-2 border-l pl-4">{children}</ul>}
+      {isOpen && <ul className="mt-1 -ml-3 border-l pl-8">{children}</ul>}
     </ul>
   )
 }
