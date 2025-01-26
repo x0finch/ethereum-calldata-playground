@@ -1,6 +1,7 @@
 import { cn } from "@shadcn/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { isValidElement, ReactNode, useState } from "react"
+import { RichActionsTextField } from "../rich-actions-text-field"
 
 interface Param {
   name: string
@@ -32,7 +33,7 @@ function FunctionRow({ name }: Pick<FunctionDetailProps, "name">) {
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name}</span>
-      <span className="text-sm text-gray-500">function</span>
+      <span className="text-sm text-muted-foreground">function</span>
     </div>
   )
 }
@@ -45,9 +46,11 @@ function SimpleParamRow({
   return (
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
-      <span className="mr-2 max-w-lg overflow-hidden text-ellipsis">
-        {value}
-      </span>
+      <RichActionsTextField
+        className="mr-2 max-w-lg overflow-hidden text-ellipsis"
+        value={value}
+        onChange={() => {}}
+      />
       <span className="text-sm bg-gray-200 rounded px-1">{type}</span>
     </div>
   )

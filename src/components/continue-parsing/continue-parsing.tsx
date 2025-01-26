@@ -57,8 +57,6 @@ export function ContinueParsing({ data }: ContinueParsingProps) {
     return null
   }
 
-  console.log("wrappedDetail: ", wrappedDetail)
-
   return <FunctionDetail {...wrappedDetail} />
 }
 
