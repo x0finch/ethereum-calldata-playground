@@ -20,7 +20,6 @@ export const useHistory = create<{
       addHistory: (item: Calldata) =>
         set((state) => {
           const newState = { history: { ...state.history, [item.id]: item } }
-          console.log("newState: ", JSON.stringify(newState))
           return newState
         }),
       removeHistory: (id: string) =>
