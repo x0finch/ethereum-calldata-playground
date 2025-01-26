@@ -3,9 +3,9 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@radix-ui/react-popover"
+import { useState } from "react"
 import { Actions } from "./actions"
 import { Content } from "./content"
-import { useState } from "react"
 import { SolidityTypeSensitivedInput } from "./solidity-type-Sensitived-input"
 
 interface RichActionsTextFieldProps {

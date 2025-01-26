@@ -1,4 +1,3 @@
-import { cn } from "@shadcn/lib/utils"
 import { ChevronDown, ChevronRight } from "lucide-react"
 import { isValidElement, ReactNode, useState } from "react"
 import { RichActionsTextField } from "../rich-actions-text-field"

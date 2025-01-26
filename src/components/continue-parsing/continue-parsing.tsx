@@ -1,13 +1,13 @@
-import useSWR from "swr"
-import { FunctionDetail, FunctionDetailProps } from "./function-detail"
 import {
-  SELECTOR_LENGTH,
   parseCallData,
   ParsedCalldata,
+  SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
 import { useMemo } from "react"
+import useSWR from "swr"
 import { Abi, parseAbi } from "viem"
+import { FunctionDetail, FunctionDetailProps } from "./function-detail"
 import { ParsingSkeleton } from "./parsing-skeleton"
 
 interface ContinueParsingProps {
