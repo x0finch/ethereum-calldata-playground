@@ -3,7 +3,7 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface Calldata {
+interface HistoryItem {
   id: string
   data: string
   createdAt: number
@@ -11,7 +11,7 @@ interface Calldata {
 }
 
 export const useHistory = create<{
-  history: { [id: string]: Calldata }
+  history: { [id: string]: HistoryItem }
   addHistory: (id: string, data: string) => void
   updateHistory: (id: string, data: string) => void
   removeHistory: (id: string) => void

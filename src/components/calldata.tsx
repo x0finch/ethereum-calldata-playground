@@ -5,13 +5,13 @@ import { ContinueParsing } from "./continue-parsing"
 
 export function Calldata({ id }: { id: string }) {
   const { history, updateHistory } = useHistory()
-  const calldata = history[id]
+  const historyItem = history[id]
 
-  if (!calldata) {
+  if (!historyItem) {
     return null
   }
 
-  const { data } = calldata
+  const { data } = historyItem
 
   return (
     <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow overflow-auto pb-10">
