@@ -7,26 +7,51 @@ interface Calldata {
   id: string
   data: string
   createdAt: number
+  updatedAt: number
 }
 
 export const useHistory = create<{
   history: { [id: string]: Calldata }
-  addHistory: (item: Calldata) => void
+  addHistory: (id: string, data: string) => void
+  updateHistory: (id: string, data: string) => void
   removeHistory: (id: string) => void
 }>()(
   persist(
     (set) => ({
       history: {},
-      addHistory: (item: Calldata) =>
+      addHistory: (id: string, data: string) =>
         set((state) => {
-          const newState = { history: { ...state.history, [item.id]: item } }
+          const newState = {
+            history: {
+              ...state.history,
+              [id]: {
+                id,
+                data,
+                createdAt: Date.now(),
+                updatedAt: Date.now(),
+              },
+            },
+          }
+
+          return newState
+        }),
+      updateHistory: (id: string, data: string) =>
+        set((state) => {
+          const newState = { history: { ...state.history } }
+
+          newState.history[id] = {
+            ...newState.history[id],
+            data,
+            updatedAt: Date.now(),
+          }
+
           return newState
         }),
       removeHistory: (id: string) =>
         set((state) => {
-          const cloned = { history: { ...state.history } }
-          delete cloned.history[id]
-          return cloned
+          const newState = { history: { ...state.history } }
+          delete newState.history[id]
+          return newState
         }),
     }),
     {

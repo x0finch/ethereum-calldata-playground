@@ -4,18 +4,23 @@ import {
   SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
-import { useMemo } from "react"
+import { isValidElement, useMemo, useState } from "react"
 import useSWR from "swr"
-import { Abi, parseAbi } from "viem"
-import { FunctionDetail, FunctionDetailProps } from "./function-detail"
+import { Abi, encodeFunctionData, parseAbi } from "viem"
+import { FunctionDetail, FunctionDetailParam } from "./function-detail"
 import { ParsingSkeleton } from "./parsing-skeleton"
 
 interface ContinueParsingProps {
   data: string
+  onDataChange: (data: string) => void
 }
 
-export function ContinueParsing({ data }: ContinueParsingProps) {
-  const selector = data.slice(0, SELECTOR_LENGTH)
+export function ContinueParsing({
+  data: initData,
+  onDataChange,
+}: ContinueParsingProps) {
+  const selector = initData.slice(0, SELECTOR_LENGTH)
+  const [data, setData] = useState(initData)
 
   const { data: functions, isLoading } = useSWR<string[]>(
     `/api/selectors/${selector}`,
@@ -38,6 +43,31 @@ export function ContinueParsing({ data }: ContinueParsingProps) {
     }
   }, [data, functions])
 
+  const onParamsChange = (params: FunctionDetailParam[]) => {
+    function flatValues(params: FunctionDetailParam[]) {
+      return params.map((param): any => {
+        if (param.children && !isValidElement(param.children)) {
+          return flatValues(param.children as FunctionDetailParam[])
+        }
+
+        return param.value
+      })
+    }
+
+    const values = flatValues(params)
+    const func = `function ${functions![0]}`
+    const abi = parseAbi([func]) as Abi
+
+    const newData = encodeFunctionData({
+      abi,
+      functionName: selector,
+      args: values,
+    })
+
+    setData(newData)
+    onDataChange(newData)
+  }
+
   const wrappedDetail = useMemo(() => {
     if (!detail) {
       return null
@@ -45,7 +75,7 @@ export function ContinueParsing({ data }: ContinueParsingProps) {
 
     return {
       ...detail,
-      params: detail.params.map(wrapParam),
+      params: wrapParams(detail.params, onParamsChange),
     }
   }, [detail])
 
@@ -57,22 +87,38 @@ export function ContinueParsing({ data }: ContinueParsingProps) {
     return null
   }
 
-  return <FunctionDetail {...wrappedDetail} />
+  return <FunctionDetail {...wrappedDetail} onParamsChange={onParamsChange} />
 }
 
-function wrapParam(
-  param: ParsedCalldata["params"][0]
-): FunctionDetailProps["params"][0] {
-  if (param.children) {
-    const children = param.children.map(wrapParam)
-    return { ...param, children }
-  }
+function wrapParams(
+  params: ParsedCalldata["params"],
+  onParamsChange: (params: FunctionDetailParam[]) => void
+): FunctionDetailParam[] {
+  return params.map((param) => {
+    if (param.children) {
+      const children = wrapParams(param.children, () => onParamsChange(params))
+      return { ...param, children }
+    }
 
-  const maybeIsSubCallData =
-    param.type === "bytes" &&
-    param.value.startsWith("0x") &&
-    param.value.length > SELECTOR_LENGTH
+    const maybeChildIsAlsoFunction =
+      param.type === "bytes" &&
+      param.value.startsWith("0x") &&
+      param.value.length > SELECTOR_LENGTH
 
-  const children = <ContinueParsing data={param.value} />
-  return { ...param, children: maybeIsSubCallData ? children : undefined }
+    const subSelector = param.value.slice(0, SELECTOR_LENGTH)
+
+    return {
+      ...param,
+      children: maybeChildIsAlsoFunction ? (
+        <ContinueParsing
+          key={subSelector}
+          data={param.value}
+          onDataChange={(data) => {
+            param.value = data
+            onParamsChange(params)
+          }}
+        />
+      ) : undefined,
+    }
+  })
 }

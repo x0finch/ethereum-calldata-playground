@@ -39,11 +39,7 @@ export function SearchingInput() {
     const { search } = values
 
     const id = generateUUID()
-    addHistory({
-      id,
-      data: search,
-      createdAt: Date.now(),
-    })
+    addHistory(id, search)
 
     router.push(`/calldata/${id}`)
   }

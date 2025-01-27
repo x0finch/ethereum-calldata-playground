@@ -4,7 +4,7 @@ import { useHistory } from "@/store/history"
 import { ContinueParsing } from "./continue-parsing"
 
 export function Calldata({ id }: { id: string }) {
-  const { history } = useHistory()
+  const { history, updateHistory } = useHistory()
   const calldata = history[id]
 
   if (!calldata) {
@@ -18,7 +18,10 @@ export function Calldata({ id }: { id: string }) {
       <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
         {data}
       </div>
-      <ContinueParsing data={data} />
+      <ContinueParsing
+        data={data}
+        onDataChange={(data) => updateHistory(id, data)}
+      />
     </div>
   )
 }
