@@ -1,10 +1,10 @@
+import { useHistory } from "@/lib/hooks/use-history"
 import {
   parseCallData,
   ParsedCalldata,
   SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
-import { useHistory } from "@/store/history"
 import { isValidElement, useEffect, useMemo, useState } from "react"
 import useSWR from "swr"
 import {

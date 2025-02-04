@@ -1,7 +1,7 @@
 "use client"
 
+import { useHistory } from "@/lib/hooks/use-history"
 import { generateUUID } from "@/lib/utils"
-import { useHistory } from "@/store/history"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Button } from "@shadcn/components/ui/button"
 import {
@@ -24,7 +24,7 @@ const formSchema = z.object({
 })
 
 export function SearchingInput() {
-  const { addHistory } = useHistory()
+  const { createHistoryItem } = useHistory()
 
   const router = useRouter()
 
@@ -39,7 +39,7 @@ export function SearchingInput() {
     const { search } = values
 
     const id = generateUUID()
-    addHistory(id, search)
+    createHistoryItem(id, search)
 
     router.push(`/calldata/${id}`)
   }

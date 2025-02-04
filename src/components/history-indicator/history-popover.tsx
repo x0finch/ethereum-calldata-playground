@@ -1,6 +1,6 @@
 "use client"
 
-import { useHistory } from "@/store/history"
+import { useHistory } from "@/lib/hooks/use-history"
 import { Button } from "@shadcn/components/ui/button"
 import {
   Popover,
@@ -19,7 +19,7 @@ export function HistoryPopover({ children }: { children: ReactNode }) {
   const pathname = usePathname()
 
   const { toast } = useToast()
-  const { history, removeHistory } = useHistory()
+  const { history, deleteHistoryItem } = useHistory()
   const sortedHistories = useMemo(
     () => Object.values(history).sort((a, b) => b.updatedAt - a.updatedAt),
     [history]
@@ -38,7 +38,7 @@ export function HistoryPopover({ children }: { children: ReactNode }) {
           >
             <span>doSomething</span>
             <span className="max-w-full text-sm font-mono text-muted-foreground overflow-clip text-ellipsis">
-              {historyItem.data.slice(0, 10)}
+              {historyItem.calldata.slice(0, 10)}
             </span>
             <Button
               id="remove-history-item"
@@ -49,7 +49,7 @@ export function HistoryPopover({ children }: { children: ReactNode }) {
                 e.preventDefault()
 
                 const timer = setTimeout(() => {
-                  removeHistory(historyItem.id)
+                  deleteHistoryItem(historyItem.id)
                   if (pathname.includes(historyItem.id)) {
                     router.push("/")
                   }

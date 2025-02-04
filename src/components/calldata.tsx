@@ -1,27 +1,27 @@
 "use client"
 
-import { useHistory } from "@/store/history"
+import { useHistory } from "@/lib/hooks/use-history"
 import { ContinueParsing } from "./continue-parsing"
 
 export function Calldata({ id }: { id: string }) {
-  const { history, updateHistory } = useHistory()
+  const { history, updateCalldata } = useHistory()
   const historyItem = history[id]
 
   if (!historyItem) {
     return null
   }
 
-  const { data } = historyItem
+  const { calldata } = historyItem
 
   return (
     <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow overflow-auto pb-10">
       <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
-        {data}
+        {calldata}
       </div>
       <ContinueParsing
         historyId={id}
-        calldata={data}
-        onCallDataChange={(data) => updateHistory(id, data)}
+        calldata={calldata}
+        onCallDataChange={(data) => updateCalldata(id, data)}
       />
     </div>
   )

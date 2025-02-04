@@ -5,7 +5,7 @@ import { persist } from "zustand/middleware"
 
 interface HistoryItem {
   id: string
-  data: string
+  calldata: string
   signatures: { [selector: string]: string }
   createdAt: number
   updatedAt: number
@@ -13,22 +13,22 @@ interface HistoryItem {
 
 export const useHistory = create<{
   history: { [id: string]: HistoryItem }
-  addHistory: (id: string, data: string) => void
-  updateHistory: (id: string, data: string) => void
-  removeHistory: (id: string) => void
+  createHistoryItem: (id: string, calldata: string) => void
+  deleteHistoryItem: (id: string) => void
+  updateCalldata: (id: string, calldata: string) => void
   applySignature: (id: string, selector: string, signature: string) => void
 }>()(
   persist(
     (set) => ({
       history: {},
-      addHistory: (id: string, data: string) =>
+      createHistoryItem: (id: string, calldata: string) =>
         set((state) => {
           const newState = {
             history: {
               ...state.history,
               [id]: {
                 id,
-                data,
+                calldata,
                 signatures: {},
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
@@ -38,19 +38,19 @@ export const useHistory = create<{
 
           return newState
         }),
-      updateHistory: (id: string, data: string) =>
+      updateCalldata: (id: string, calldata: string) =>
         set((state) => {
           const newState = { history: { ...state.history } }
 
           newState.history[id] = {
             ...newState.history[id],
-            data,
+            calldata: calldata,
             updatedAt: Date.now(),
           }
 
           return newState
         }),
-      removeHistory: (id: string) =>
+      deleteHistoryItem: (id: string) =>
         set((state) => {
           const newState = { history: { ...state.history } }
           delete newState.history[id]
