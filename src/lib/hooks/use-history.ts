@@ -3,7 +3,7 @@
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
-interface HistoryItem {
+export interface HistoryItem {
   id: string
   calldata: string
   signatures: { [selector: string]: string }
