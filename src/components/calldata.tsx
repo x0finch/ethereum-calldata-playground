@@ -19,8 +19,9 @@ export function Calldata({ id }: { id: string }) {
         {data}
       </div>
       <ContinueParsing
-        data={data}
-        onDataChange={(data) => updateHistory(id, data)}
+        historyId={id}
+        calldata={data}
+        onCallDataChange={(data) => updateHistory(id, data)}
       />
     </div>
   )

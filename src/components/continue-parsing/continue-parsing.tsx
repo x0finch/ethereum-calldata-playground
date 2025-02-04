@@ -4,68 +4,113 @@ import {
   SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
-import { isValidElement, useMemo, useState } from "react"
+import { useHistory } from "@/store/history"
+import { isValidElement, useEffect, useMemo, useState } from "react"
 import useSWR from "swr"
-import { Abi, encodeFunctionData, parseAbi } from "viem"
+import {
+  Abi,
+  AbiFunction,
+  encodeFunctionData,
+  parseAbi,
+  toFunctionSelector,
+} from "viem"
 import { FunctionDetail, FunctionDetailParam } from "./function-detail"
 import { ParsingSkeleton } from "./parsing-skeleton"
 
 interface ContinueParsingProps {
-  data: string
-  onDataChange: (data: string) => void
+  historyId: string
+  calldata: string
+  onCallDataChange: (calldata: string) => void
 }
 
 export function ContinueParsing({
-  data: initData,
-  onDataChange,
+  historyId,
+  calldata: initCalldata,
+  onCallDataChange,
 }: ContinueParsingProps) {
-  const selector = initData.slice(0, SELECTOR_LENGTH)
-  const [data, setData] = useState(initData)
+  const { history, applySignature } = useHistory()
+  const historyItem = history[historyId]
 
-  const { data: functions, isLoading } = useSWR<string[]>(
-    `/api/selectors/${selector}`,
+  const [calldata, setCallData] = useState(initCalldata)
+  const selector = calldata.slice(0, SELECTOR_LENGTH)
+  const existingSignature = historyItem?.signatures[selector]
+
+  const { data: signatures = [], isLoading } = useSWR<string[]>(
+    existingSignature ? undefined : `/api/selectors/${selector}`,
     fetcher
   )
+  const [selectedSignature, selectedAbi] = useMemo(() => {
+    if (!existingSignature && !signatures.length) {
+      return []
+    }
 
-  const [detail] = useMemo(() => {
-    if (!functions?.length) {
-      return [null, null]
+    for (const signature of [existingSignature, ...signatures].filter(
+      Boolean
+    )) {
+      const func = `function ${signature}`
+
+      try {
+        const abi = parseAbi([func]) as Abi
+        return [signature, abi]
+      } catch (error) {
+        console.error(`Failed to parse signature ${signature}: `, error)
+      }
+    }
+
+    return []
+  }, [existingSignature, signatures])
+
+  useEffect(() => {
+    if (!selectedSignature) {
+      return
     }
 
     try {
-      const func = `function ${functions[0]}`
-      const abi = parseAbi([func]) as Abi
-      const detail = parseCallData(data, abi)
-
-      return [detail, null]
+      const func = `function ${selectedSignature}`
+      const selector = toFunctionSelector(func)
+      applySignature(historyId, selector, selectedSignature)
     } catch (error) {
-      return [null, error]
+      console.error("Failed to apply signature: ", error, selectedSignature)
     }
-  }, [data, functions])
+  }, [selectedSignature])
+
+  const detail = useMemo(() => {
+    if (!selectedAbi) {
+      return
+    }
+
+    try {
+      return parseCallData(calldata, selectedAbi)
+    } catch (error) {
+      console.error("Failed to parse calldata: ", error, calldata)
+    }
+  }, [selectedAbi, calldata])
 
   const onParamsChange = (params: FunctionDetailParam[]) => {
-    function flatValues(params: FunctionDetailParam[]) {
+    if (!selectedAbi) {
+      return
+    }
+
+    function flatArgs(params: FunctionDetailParam[]) {
       return params.map((param): any => {
         if (param.children && !isValidElement(param.children)) {
-          return flatValues(param.children as FunctionDetailParam[])
+          return flatArgs(param.children as FunctionDetailParam[])
         }
 
         return param.value
       })
     }
 
-    const values = flatValues(params)
-    const func = `function ${functions![0]}`
-    const abi = parseAbi([func]) as Abi
+    const args = flatArgs(params)
 
     const newData = encodeFunctionData({
-      abi,
-      functionName: selector,
-      args: values,
+      abi: selectedAbi,
+      functionName: (selectedAbi[0] as AbiFunction).name,
+      args,
     })
 
-    setData(newData)
-    onDataChange(newData)
+    setCallData(newData)
+    onCallDataChange(newData)
   }
 
   const wrappedDetail = useMemo(() => {
@@ -75,7 +120,7 @@ export function ContinueParsing({
 
     return {
       ...detail,
-      params: wrapParams(detail.params, onParamsChange),
+      params: wrapParams(historyId, detail.params, onParamsChange),
     }
   }, [detail])
 
@@ -91,12 +136,15 @@ export function ContinueParsing({
 }
 
 function wrapParams(
+  historyId: string,
   params: ParsedCalldata["params"],
   onParamsChange: (params: FunctionDetailParam[]) => void
 ): FunctionDetailParam[] {
   return params.map((param) => {
     if (param.children) {
-      const children = wrapParams(param.children, () => onParamsChange(params))
+      const children = wrapParams(historyId, param.children, () =>
+        onParamsChange(params)
+      )
       return { ...param, children }
     }
 
@@ -112,9 +160,10 @@ function wrapParams(
       children: maybeChildIsAlsoFunction ? (
         <ContinueParsing
           key={subSelector}
-          data={param.value}
-          onDataChange={(data) => {
-            param.value = data
+          historyId={historyId}
+          calldata={param.value}
+          onCallDataChange={(calldata) => {
+            param.value = calldata
             onParamsChange(params)
           }}
         />

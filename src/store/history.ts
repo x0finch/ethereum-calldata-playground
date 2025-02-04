@@ -6,6 +6,7 @@ import { persist } from "zustand/middleware"
 interface HistoryItem {
   id: string
   data: string
+  signatures: { [selector: string]: string }
   createdAt: number
   updatedAt: number
 }
@@ -15,6 +16,7 @@ export const useHistory = create<{
   addHistory: (id: string, data: string) => void
   updateHistory: (id: string, data: string) => void
   removeHistory: (id: string) => void
+  applySignature: (id: string, selector: string, signature: string) => void
 }>()(
   persist(
     (set) => ({
@@ -27,6 +29,7 @@ export const useHistory = create<{
               [id]: {
                 id,
                 data,
+                signatures: {},
                 createdAt: Date.now(),
                 updatedAt: Date.now(),
               },
@@ -53,9 +56,24 @@ export const useHistory = create<{
           delete newState.history[id]
           return newState
         }),
+      applySignature: (id: string, selector: string, signature: string) =>
+        set((state) => {
+          const newState = { history: { ...state.history } }
+
+          newState.history[id] = {
+            ...newState.history[id],
+            updatedAt: Date.now(),
+            signatures: {
+              ...newState.history[id].signatures,
+              [selector]: signature,
+            },
+          }
+
+          return newState
+        }),
     }),
     {
-      name: "history-store",
+      name: "calldata-history",
     }
   )
 )
