@@ -115,11 +115,11 @@ function SimpleParamRow({
     <div className="flex items-center">
       <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
       <RichActionsTextField
-        className="mr-2 max-w-lg overflow-hidden text-ellipsis"
+        className="mr-2 max-w-lg overflow-hidden text-ellipsis font-mono"
         value={value}
         onChange={(value) => index && onParamChange(index, value)}
       />
-      <span className="text-sm bg-gray-200 rounded px-1">{type}</span>
+      <span className="text-sm bg-gray-200 rounded px-1 font-mono">{type}</span>
     </div>
   )
 }
