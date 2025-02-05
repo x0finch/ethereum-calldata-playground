@@ -58,6 +58,11 @@ export const useHistory = create<{
         }),
       applySignature: (id: string, selector: string, signature: string) =>
         set((state) => {
+          const historyItem = state.history[id]
+          if (historyItem?.signatures[selector] === signature) {
+            return state
+          }
+
           const newState = { history: { ...state.history } }
 
           newState.history[id] = {

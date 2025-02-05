@@ -53,11 +53,15 @@ function HistoryItemView({ id, calldata, signatures, updatedAt }: HistoryItem) {
   const describe =
     dataLength <= 0 ? selector : `${selector}...(+${dataLength} more)`
   const updatedAtTimeAgo = timeAgo(updatedAt)
+  const isSelected = pathname.includes(id)
 
   return (
     <Link
       href={`/calldata/${id}`}
-      className="flex flex-col py-2 border-b cursor-pointer [&>*]:px-2 relative group"
+      className={cn(
+        "flex flex-col py-2 border-b cursor-pointer [&>*]:px-2 hover:bg-muted/50 hover:border-transparent hover:rounded-md",
+        isSelected && "bg-muted border-transparent rounded-md"
+      )}
     >
       <div className="flex flex-row justify-between items-center">
         <span className={cn("font-bold", isDeleting && "line-through")}>
