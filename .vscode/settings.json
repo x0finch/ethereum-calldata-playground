@@ -2,5 +2,11 @@
   "cSpell.words": [
     "shadcn",
     "viem"
+  ],
+  "typescript.preferences.autoImportFileExcludePatterns": [
+    "@radix-ui/*"
+  ],
+  "javascript.preferences.autoImportFileExcludePatterns": [
+    "@radix-ui/*"
   ]
 }
