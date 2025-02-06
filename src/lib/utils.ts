@@ -1,3 +1,5 @@
+import { formatUnits, parseUnits } from "viem"
+
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
     const r = (Math.random() * 16) | 0
@@ -52,4 +54,17 @@ export function timeAgo(timestamp: number) {
   }
 
   return "Just now"
+}
+
+export const ETH_UNIT_DECIMALS = {
+  wei: 0,
+  gwei: 9,
+  ether: 18,
+} as const
+
+export type EthUnit = keyof typeof ETH_UNIT_DECIMALS
+
+export function transformEthUnit(value: string, from: EthUnit, to: EthUnit) {
+  const valueInWei = parseUnits(value, ETH_UNIT_DECIMALS[from])
+  return formatUnits(valueInWei, ETH_UNIT_DECIMALS[to])
 }

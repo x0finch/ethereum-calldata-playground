@@ -14,9 +14,9 @@ export function ButtonGroup({
   onItemClick?: (value: string) => void
 }) {
   const wrappedChildren = Array.isArray(children)
-    ? children.map((child) => (
+    ? children.map((child, index) => (
         <ToggleGroupItem
-          key={child.props.value}
+          key={child.props.value ?? index}
           value={child.props.value}
           asChild
           className="min-w-[unset] h-[inherit]"
@@ -32,7 +32,7 @@ export function ButtonGroup({
       value=""
       className={cn(
         "rounded-lg overflow-clip text-background gap-0",
-        "[&>button]:rounded-none [&>button]:w-8 [&>button]:h-8 [&>button]:bg-foreground",
+        "[&>button]:rounded-none [&>button]:w-8 [&>button]:h-8 [&>button]:bg-foreground ",
         className
       )}
       onValueChange={(value) => onItemClick?.(value)}
