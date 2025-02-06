@@ -1,4 +1,4 @@
-import { Calldata } from "./calldata"
+import { CalldataCard } from "./calldata-card"
 import { HistoryIndicator } from "./history-indicator"
 import { SearchingInput } from "./searching-input"
 import { Title } from "./title"
@@ -12,7 +12,7 @@ export function Panel({ id }: Props) {
     <div className="flex min-h-screen flex-col items-center p-8 relative">
       <Title />
       <SearchingInput />
-      <Calldata id={id} />
+      <CalldataCard id={id} />
       <HistoryIndicator />
     </div>
   )

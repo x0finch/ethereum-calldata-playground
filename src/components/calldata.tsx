@@ -1,28 +1,35 @@
-"use client"
+import { Button } from "@shadcn/components/ui/button"
+import { useToast } from "@shadcn/hooks/use-toast"
+import copy from "copy-to-clipboard"
+import { Copy, Play } from "lucide-react"
+import { ButtonGroup } from "./button-group"
 
-import { useHistory } from "@/lib/hooks/use-history"
-import { ContinueParsing } from "./continue-parsing"
+export function Calldata({ calldata }: { calldata: string }) {
+  const { toast } = useToast()
 
-export function Calldata({ id }: { id: string }) {
-  const { history, updateCalldata } = useHistory()
-  const historyItem = history[id]
-
-  if (!historyItem) {
-    return null
+  const onItemClick = (value: string) => {
+    if (value === "copy") {
+      copy(calldata)
+      toast({
+        title: "Copied!",
+      })
+    } else if (value === "play") {
+      console.log("play")
+    }
   }
-
-  const { calldata } = historyItem
-
   return (
-    <div className="w-full max-w-4xl bg-white p-4 rounded-lg shadow overflow-auto pb-10">
-      <div className="text-sm font-mono mb-4 overflow-hidden text-ellipsis text-muted-foreground">
+    <div className="flex flex-row items-center mb-4">
+      <span className="text-sm font-mono overflow-hidden text-ellipsis text-muted-foreground">
         {calldata}
-      </div>
-      <ContinueParsing
-        historyId={id}
-        calldata={calldata}
-        onCallDataChange={(data) => updateCalldata(id, data)}
-      />
+      </span>
+      <ButtonGroup onItemClick={onItemClick}>
+        <Button value="copy">
+          <Copy className="w-4 h-4" />
+        </Button>
+        <Button value="play">
+          <Play className="w-4 h-4" />
+        </Button>
+      </ButtonGroup>
     </div>
   )
 }

@@ -1,11 +1,11 @@
-import { ToggleGroup } from "@radix-ui/react-toggle-group"
 import { Button } from "@shadcn/components/ui/button"
 import { useToast } from "@shadcn/hooks/use-toast"
 import copy from "copy-to-clipboard"
 import { Copy, Pencil } from "lucide-react"
+import { ButtonGroup } from "../button-group"
 
 export function Actions({
-  value,
+  value: calldata,
   onEdit,
 }: {
   value: string
@@ -13,24 +13,25 @@ export function Actions({
 }) {
   const { toast } = useToast()
 
-  const onCopy = () => {
-    copy(value)
-    toast({
-      title: "Copied!",
-    })
+  const onItemClick = (value: string) => {
+    if (value === "copy") {
+      copy(calldata)
+      toast({
+        title: "Copied!",
+      })
+    } else if (value === "edit") {
+      onEdit()
+    }
   }
 
   return (
-    <ToggleGroup
-      type="single"
-      className="rounded-md overflow-clip text-background [&>button]:bg-foreground [&>button]:rounded-none [&>button]:w-8 [&>button]:h-8"
-    >
-      <Button size="icon" variant="ghost" onClick={onCopy}>
+    <ButtonGroup onItemClick={onItemClick}>
+      <Button value="copy">
         <Copy />
       </Button>
-      <Button size="icon" variant="ghost" onClick={onEdit}>
+      <Button value="edit">
         <Pencil />
       </Button>
-    </ToggleGroup>
+    </ButtonGroup>
   )
 }
