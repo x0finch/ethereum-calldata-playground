@@ -17,18 +17,27 @@ export interface ApplicationError extends Error {
 export const fetcher = async (url: string, options?: RequestInit) => {
   const res = await fetch(url, options)
 
+  function formatResponse(res: Response) {
+    const isJson = res.headers.get("content-type")?.includes("application/json")
+    if (isJson) {
+      return res.json()
+    }
+
+    return res.text()
+  }
+
   if (!res.ok) {
     const error = new Error(
       "An error occurred while fetching the data."
     ) as ApplicationError
 
-    error.info = await res.json()
+    error.info = await formatResponse(res)
     error.status = res.status
 
     throw error
   }
 
-  return res.json()
+  return formatResponse(res)
 }
 
 export function timeAgo(timestamp: number) {
