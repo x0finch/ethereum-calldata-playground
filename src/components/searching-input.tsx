@@ -16,7 +16,7 @@ import { useRouter } from "next/navigation"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
 
-const CALLDATA_PATTERN = /^0x[0-9a-fA-F]{8,}$/
+export const CALLDATA_PATTERN = /^0x[0-9a-fA-F]{8,}$/
 const formSchema = z.object({
   search: z.string().refine((value) => CALLDATA_PATTERN.test(value), {
     message: "Invalid calldata",
