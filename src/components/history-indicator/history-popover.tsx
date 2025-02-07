@@ -57,7 +57,7 @@ function HistoryItemView({ id, calldata, signatures, updatedAt }: HistoryItem) {
 
   return (
     <Link
-      href={`/calldata/${id}`}
+      href={`/i/${id}`}
       className={cn(
         "flex flex-col py-2 border-b cursor-pointer [&>*]:px-2 hover:bg-muted/50 hover:border-transparent hover:rounded-md group",
         isSelected && "bg-muted border-transparent rounded-md"
