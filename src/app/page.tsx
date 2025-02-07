@@ -1,5 +1,5 @@
-import { Panel } from "@/components/panel"
+import { Playground } from "@/components/playground"
 
 export default function Home() {
-  return <Panel id="" />
+  return <Playground id="" />
 }
