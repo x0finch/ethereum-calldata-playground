@@ -5,8 +5,8 @@ import {
   SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
+import { useQuery } from "@tanstack/react-query"
 import { isValidElement, useEffect, useMemo, useState } from "react"
-import useSWR from "swr"
 import {
   Abi,
   AbiFunction,
@@ -35,10 +35,11 @@ export function ContinueParsing({
   const selector = calldata.slice(0, SELECTOR_LENGTH)
   const existingSignature = historyItem?.signatures[selector]
 
-  const { data: signatures = [], isLoading } = useSWR<string[]>(
-    existingSignature ? undefined : `/api/selectors/${selector}`,
-    fetcher
-  )
+  const { data: signatures = [], isLoading } = useQuery({
+    queryKey: ["selectors", selector],
+    queryFn: ({ signal }) => fetcher(`/api/selectors/${selector}`, { signal }),
+    enabled: !existingSignature,
+  })
   const [selectedSignature, selectedAbi] = useMemo(() => {
     if (!existingSignature && !signatures.length) {
       return []
