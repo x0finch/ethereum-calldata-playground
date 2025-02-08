@@ -1,4 +1,3 @@
-import { urlToUrlWithoutFlightMarker } from "next/dist/client/components/router-reducer/fetch-server-response"
 import { formatUnits, parseUnits } from "viem"
 
 export function generateUUID(): string {
@@ -14,7 +13,7 @@ export interface ApplicationError extends Error {
   status: number
 }
 
-export const fetcher = async (url: string, options?: RequestInit) => {
+export async function fetcher(url: string, options?: RequestInit) {
   const res = await fetch(url, options)
 
   function formatResponse(res: Response) {
@@ -38,6 +37,15 @@ export const fetcher = async (url: string, options?: RequestInit) => {
   }
 
   return formatResponse(res)
+}
+
+export async function serverFetcher(url: string, options?: RequestInit) {
+  if (url.startsWith("/")) {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000"
+    url = `${baseUrl}${url}`
+  }
+
+  return fetcher(url, options)
 }
 
 export function timeAgo(timestamp: number) {

@@ -2,10 +2,10 @@
 
 import { useHistory } from "@/lib/hooks/use-history"
 import { generateUUID } from "@/lib/utils"
+import { useToast } from "@shadcn/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
 import { CALLDATA_PATTERN } from "./searching-input"
-import { useToast } from "@shadcn/hooks/use-toast"
 
 export function CalldataPageRedirect({ calldata }: { calldata: string }) {
   const router = useRouter()

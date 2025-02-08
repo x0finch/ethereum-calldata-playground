@@ -1,10 +1,24 @@
-"use client"
+import { serverFetcher } from "@/lib/utils"
+import { notFound, redirect, RedirectType } from "next/navigation"
 
-import { HashPageRedirect } from "@/components/hash-page-redirect"
+const HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/
 
 export default async function HashPage(props: {
   params: Promise<{ hash: string }>
 }) {
   const { hash } = await props.params
-  return <HashPageRedirect hash={hash} />
+
+  if (!HASH_PATTERN.test(hash)) {
+    return notFound()
+  }
+
+  const calldata: string | null = await serverFetcher(
+    `/api/hashes/${hash}`
+  ).catch(() => null)
+
+  if (calldata) {
+    return redirect(`/calldata/${calldata}`, RedirectType.replace)
+  }
+
+  return notFound()
 }
