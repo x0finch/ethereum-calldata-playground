@@ -14,7 +14,10 @@ export default async function HashPage(props: {
 
   const calldata: string | null = await serverFetcher(
     `/api/hashes/${hash}`
-  ).catch(() => null)
+  ).catch((err) => {
+    console.error("Error fetching calldata for hash", hash, err)
+    return null
+  })
 
   if (calldata) {
     return redirect(`/calldata/${calldata}`, RedirectType.replace)
