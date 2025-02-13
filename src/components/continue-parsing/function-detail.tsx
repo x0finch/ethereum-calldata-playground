@@ -12,7 +12,7 @@ export interface FunctionDetailParam {
 }
 
 export interface FunctionDetailProps {
-  name: string
+  name: ReactNode
   params: FunctionDetailParam[]
   onParamsChange: (params: FunctionDetailParam[]) => void
 }
@@ -94,12 +94,7 @@ export function FunctionDetail({
 }
 
 function FunctionRow({ name }: Pick<FunctionDetailProps, "name">) {
-  return (
-    <div className="flex items-center">
-      <span className="font-semibold mr-2">{name}</span>
-      <span className="text-sm text-muted-foreground">function</span>
-    </div>
-  )
+  return <div className="font-semibold mr-2">{name}</div>
 }
 
 function SimpleParamRow({
@@ -172,7 +167,7 @@ function Chevron({
   )
 }
 
-function SimpleTree({
+export function SimpleTree({
   parent,
   children,
 }: {

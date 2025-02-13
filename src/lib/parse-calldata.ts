@@ -65,3 +65,51 @@ function parseAbiParameter(
     }),
   }
 }
+
+const MAX_UINT256 = BigInt(
+  "0xffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
+)
+const BN_ZERO = BigInt(0)
+
+export type MultiSendTransaction = {
+  toAddress: string
+  value: bigint
+  calldata: string
+}
+
+export function parseGnosisSafeMultiSend(data: string): MultiSendTransaction[] {
+  const transactions: MultiSendTransaction[] = []
+
+  if (data.startsWith("0x")) {
+    data = data.slice(2)
+  }
+
+  let offset = 0
+  while (offset < data.length) {
+    const _operation = data.slice(offset, (offset += 1 * 2))
+    const toAddress = data.slice(offset, (offset += 20 * 2))
+    const value = data.slice(offset, (offset += 32 * 2))
+    const valueBN = BigInt(`0x${value}`)
+
+    const dataLength = data.slice(offset, (offset += 32 * 2))
+    const dataLengthN = Number(BigInt(`0x${dataLength}`))
+    const calldata =
+      dataLengthN > 0 ? data.slice(offset, (offset += dataLengthN * 2)) : ""
+
+    const isAddressValid = toAddress.length === 40
+    const isValueValid = valueBN >= BN_ZERO && valueBN <= MAX_UINT256
+    const isCalldataValid = calldata.length === dataLengthN * 2
+
+    if (!isAddressValid || !isValueValid || !isCalldataValid) {
+      throw new Error("Invalid multi-send transaction")
+    }
+
+    transactions.push({
+      value: valueBN,
+      toAddress: `0x${toAddress}`,
+      calldata: `0x${calldata}`,
+    })
+  }
+
+  return transactions
+}

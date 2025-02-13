@@ -6,7 +6,7 @@ import {
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
 import { useQuery } from "@tanstack/react-query"
-import { isValidElement, useEffect, useMemo, useState } from "react"
+import { isValidElement, ReactNode, useEffect, useMemo, useState } from "react"
 import {
   Abi,
   AbiFunction,
@@ -16,17 +16,20 @@ import {
 } from "viem"
 import { FunctionDetail, FunctionDetailParam } from "./function-detail"
 import { ParsingSkeleton } from "./parsing-skeleton"
+import { UnwrappedMultiSend } from "./unwrapped-multi-send"
 
 interface ContinueParsingProps {
   historyId: string
   calldata: string
-  onCallDataChange: (calldata: string) => void
+  onCallDataChange?: (calldata: string) => void
+  wrapName?: (name: string) => ReactNode
 }
 
 export function ContinueParsing({
   historyId,
   calldata: initCalldata,
   onCallDataChange,
+  wrapName,
 }: ContinueParsingProps) {
   const { history, applySignature } = useHistory()
   const historyItem = history[historyId]
@@ -88,7 +91,7 @@ export function ContinueParsing({
   }, [selectedAbi, calldata])
 
   const onParamsChange = (params: FunctionDetailParam[]) => {
-    if (!selectedAbi) {
+    if (!selectedAbi || !onCallDataChange) {
       return
     }
 
@@ -120,10 +123,15 @@ export function ContinueParsing({
     }
 
     return {
-      ...detail,
-      params: wrapParams(historyId, detail.params, onParamsChange),
+      name: wrapName ? wrapName(detail.name) : detail.name,
+      params: wrapParams(
+        historyId,
+        detail.params,
+        onParamsChange,
+        selector === "0x8d80ff0a" ? UnwrappedMultiSend : ContinueParsing
+      ),
     }
-  }, [detail])
+  }, [detail, wrapName])
 
   if (isLoading) {
     return <ParsingSkeleton />
@@ -139,12 +147,16 @@ export function ContinueParsing({
 function wrapParams(
   historyId: string,
   params: ParsedCalldata["params"],
-  onParamsChange: (params: FunctionDetailParam[]) => void
+  onParamsChange: (params: FunctionDetailParam[]) => void,
+  Component: React.ComponentType<ContinueParsingProps>
 ): FunctionDetailParam[] {
   return params.map((param) => {
     if (param.children) {
-      const children = wrapParams(historyId, param.children, () =>
-        onParamsChange(params)
+      const children = wrapParams(
+        historyId,
+        param.children,
+        () => onParamsChange(params),
+        ContinueParsing
       )
       return { ...param, children }
     }
@@ -159,7 +171,7 @@ function wrapParams(
     return {
       ...param,
       children: maybeChildIsAlsoFunction ? (
-        <ContinueParsing
+        <Component
           key={subSelector}
           historyId={historyId}
           calldata={param.value}
