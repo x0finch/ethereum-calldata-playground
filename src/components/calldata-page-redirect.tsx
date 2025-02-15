@@ -2,6 +2,7 @@
 
 import { useHistory } from "@/lib/hooks/use-history"
 import { generateUUID } from "@/lib/utils"
+import { unzip } from "@/lib/zips"
 import { useToast } from "@shadcn/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
@@ -13,20 +14,33 @@ export function CalldataPageRedirect({ calldata }: { calldata: string }) {
   const { createHistoryItem } = useHistory()
 
   useEffect(() => {
-    const isCalldataValid = CALLDATA_PATTERN.test(calldata)
+    async function handleCalldata(calldata: string) {
+      if (!calldata.startsWith("0x")) {
+        try {
+          const unzipped = await unzip(calldata)
+          calldata = unzipped
+        } catch (err) {
+          console.error("Failed to unzip calldata: ", err)
+        }
+      }
 
-    if (!isCalldataValid) {
-      toast({
-        title: "Invalid calldata",
-        description: "Please enter a valid calldata",
-      })
-      router.replace("/")
-      return
+      const isCalldataValid = CALLDATA_PATTERN.test(calldata)
+
+      if (!isCalldataValid) {
+        toast({
+          title: "Invalid calldata",
+          description: "Please enter a valid calldata",
+        })
+        router.replace("/")
+        return
+      }
+
+      const id = generateUUID()
+      createHistoryItem(id, calldata)
+      router.replace(`/i/${id}`)
     }
 
-    const id = generateUUID()
-    createHistoryItem(id, calldata)
-    router.replace(`/i/${id}`)
+    handleCalldata(calldata)
   }, [calldata])
 
   return <div>Redirecting...</div>
