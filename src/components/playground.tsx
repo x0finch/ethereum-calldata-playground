@@ -1,6 +1,6 @@
 import { CalldataCard } from "./calldata-card"
 import { HistoryIndicator } from "./history-indicator"
-import { SearchingInput } from "./searching-input"
+import { Searching } from "./searching"
 import { Title } from "./title"
 
 type Props = {
@@ -11,7 +11,7 @@ export function Playground({ id }: Props) {
   return (
     <div className="flex min-h-screen flex-col items-center p-8 relative">
       <Title />
-      <SearchingInput />
+      <Searching />
       <CalldataCard id={id} />
       <HistoryIndicator />
     </div>

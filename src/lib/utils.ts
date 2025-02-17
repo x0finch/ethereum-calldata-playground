@@ -86,3 +86,7 @@ export function transformEthUnit(value: string, from: EthUnit, to: EthUnit) {
   const valueInWei = parseUnits(value, ETH_UNIT_DECIMALS[from])
   return formatUnits(valueInWei, ETH_UNIT_DECIMALS[to])
 }
+
+export function shortAddress(address: string) {
+  return `${address.slice(0, 6)}...${address.slice(-6)}`
+}

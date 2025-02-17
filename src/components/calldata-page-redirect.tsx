@@ -6,7 +6,7 @@ import { unzip } from "@/lib/zips"
 import { useToast } from "@shadcn/hooks/use-toast"
 import { useRouter } from "next/navigation"
 import { useEffect } from "react"
-import { CALLDATA_PATTERN } from "./searching-input"
+import { CALLDATA_PATTERN } from "./searching"
 
 export function CalldataPageRedirect({ calldata }: { calldata: string }) {
   const router = useRouter()
