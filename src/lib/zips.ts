@@ -1,7 +1,7 @@
 import zlib from "zlib"
 
 export async function zip(hex: `0x${string}`): Promise<string> {
-  const buffer = Buffer.from(hex, "hex")
+  const buffer = Buffer.from(hex.slice(2), "hex")
   const compressed = await new Promise<Buffer>((resolve, reject) => {
     zlib.gzip(buffer, (err, result) => {
       if (err) reject(err)
