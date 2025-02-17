@@ -5,9 +5,9 @@ export async function GET(
   const { hash } = await params
 
   try {
-    const calldata = await getCalldataFromTenderly(hash)
-    if (calldata) {
-      return new Response(calldata, { status: 200 })
+    const tx = await getTxFromTenderly(hash)
+    if (tx) {
+      return Response.json(tx, { status: 200 })
     }
   } catch {
     // do nothing
@@ -18,10 +18,12 @@ export async function GET(
 
 interface TenderlyTransaction {
   hash: string
+  from: string
+  to: string
   input: string
 }
 
-async function getCalldataFromTenderly(hash: string) {
+async function getTxFromTenderly(hash: string) {
   const abortController = new AbortController()
   const timeout = setTimeout(() => abortController.abort(), 10000)
 
@@ -32,5 +34,10 @@ async function getCalldataFromTenderly(hash: string) {
 
   clearTimeout(timeout)
 
-  return response.transactions?.find((tx) => tx.hash === hash)?.input
+  const tx = response.transactions?.find((tx) => tx.hash === hash)
+  if (tx) {
+    return tx
+  }
+
+  return null
 }

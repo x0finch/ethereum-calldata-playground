@@ -1,5 +1,7 @@
 import { serverFetcher } from "@/lib/utils"
+import { zip } from "@/lib/zips"
 import { notFound, redirect, RedirectType } from "next/navigation"
+import { Hex } from "viem"
 
 const HASH_PATTERN = /^0x[a-fA-F0-9]{64}$/
 
@@ -12,15 +14,16 @@ export default async function HashPage(props: {
     return notFound()
   }
 
-  const calldata: string | null = await serverFetcher(
+  const tx: { input: string } | null = await serverFetcher(
     `/api/hashes/${hash}`
   ).catch((err) => {
-    console.error("Error fetching calldata for hash", hash, err)
+    console.error("Error fetching tx for hash", hash, err)
     return null
   })
 
-  if (calldata) {
-    return redirect(`/calldata/${calldata}`, RedirectType.replace)
+  if (tx?.input) {
+    const zipped = await zip(tx.input as Hex)
+    return redirect(`/calldata/${zipped}`, RedirectType.replace)
   }
 
   return notFound()
