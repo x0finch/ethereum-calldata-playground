@@ -9,7 +9,11 @@ export async function zip(hex: `0x${string}`): Promise<string> {
     })
   })
 
-  return compressed.toString("base64url")
+  return base64UrlEncode(compressed.toString("base64"))
+}
+
+function base64UrlEncode(base64: string): string {
+  return base64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "")
 }
 
 export async function unzip(base64: string): Promise<`0x${string}`> {
