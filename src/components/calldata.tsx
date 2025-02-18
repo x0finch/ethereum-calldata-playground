@@ -33,8 +33,8 @@ export function Calldata({ calldata }: { calldata: string }) {
   }
 
   return (
-    <div className="flex flex-row items-center mb-4">
-      <span className="text-sm font-mono overflow-hidden text-ellipsis text-muted-foreground">
+    <div className="flex flex-row items-center mb-4 flex-wrap gap-1">
+      <span className="text-sm font-mono overflow-hidden text-ellipsis text-muted-foreground min-w-56 flex-1">
         {calldata}
       </span>
       <ButtonGroup onItemClick={onItemClick}>
