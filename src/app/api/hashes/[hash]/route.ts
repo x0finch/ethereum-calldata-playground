@@ -1,3 +1,12 @@
+import type { Address, Hex } from "viem"
+
+export interface TxResponse {
+  hash: Hex
+  from: Address
+  to: Address
+  calldata: Hex
+}
+
 export async function GET(
   _request: Request,
   { params }: { params: Promise<{ hash: string }> }
@@ -7,7 +16,8 @@ export async function GET(
   try {
     const tx = await getTxFromTenderly(hash)
     if (tx) {
-      return Response.json(tx, { status: 200 })
+      const { hash, from, to, input: calldata } = tx
+      return Response.json({ hash, from, to, calldata }, { status: 200 })
     }
   } catch {
     // do nothing
