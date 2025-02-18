@@ -1,9 +1,19 @@
 "use client"
 
+import { Address, Hex } from "viem"
 import { create } from "zustand"
 import { persist } from "zustand/middleware"
 
+export interface TxContext {
+  hash: Hex
+  from: Address
+  to: Address
+  calldata: string
+}
+
 export interface HistoryItem {
+  context?: TxContext
+
   id: string
   calldata: string
   signatures: { [selector: string]: string }
@@ -13,7 +23,7 @@ export interface HistoryItem {
 
 export const useHistory = create<{
   history: { [id: string]: HistoryItem }
-  createHistoryItem: (id: string, calldata: string) => void
+  createHistoryItem: (id: string, calldata: string, context?: TxContext) => void
   deleteHistoryItem: (id: string) => void
   updateCalldata: (id: string, calldata: string) => void
   applySignature: (id: string, selector: string, signature: string) => void
@@ -21,12 +31,14 @@ export const useHistory = create<{
   persist(
     (set) => ({
       history: {},
-      createHistoryItem: (id: string, calldata: string) =>
+      createHistoryItem: (id: string, calldata: string, context?: TxContext) =>
         set((state) => {
           const newState = {
             history: {
               ...state.history,
               [id]: {
+                context,
+
                 id,
                 calldata,
                 signatures: {},

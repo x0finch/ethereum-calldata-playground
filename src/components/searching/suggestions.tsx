@@ -1,3 +1,4 @@
+import type { TxResponse } from "@/app/api/hashes/[hash]/route"
 import { useHistory } from "@/lib/hooks/use-history"
 import { SELECTOR_LENGTH } from "@/lib/parse-calldata"
 import { fetcher, generateUUID, shortAddress } from "@/lib/utils"
@@ -37,17 +38,13 @@ function IsItAContractCall({ searchTerm }: { searchTerm: string }) {
   const { createHistoryItem } = useHistory()
   const router = useRouter()
 
-  const { data: tx, isLoading: isTxLoading } = useQuery<{
-    input: string
-    from: string
-    to: string
-  }>({
+  const { data: tx, isLoading: isTxLoading } = useQuery<TxResponse>({
     queryKey: ["hashes", searchTerm],
     queryFn: ({ signal }) => fetcher(`/api/hashes/${searchTerm}`, { signal }),
   })
 
-  const hasValidCalldata = CALLLDATA_PATTERN.test(tx?.input ?? "")
-  const selector = tx?.input?.slice(0, SELECTOR_LENGTH)
+  const hasValidCalldata = CALLLDATA_PATTERN.test(tx?.calldata ?? "")
+  const selector = tx?.calldata?.slice(0, SELECTOR_LENGTH)
   const { data: signatures = [], isLoading: isSelectorsLoading } = useQuery({
     queryKey: ["selectors", selector],
     queryFn: ({ signal }) => fetcher(`/api/selectors/${selector}`, { signal }),
@@ -66,12 +63,12 @@ function IsItAContractCall({ searchTerm }: { searchTerm: string }) {
   const shortTo = shortAddress(tx?.to ?? "")
 
   const handleClick = () => {
-    if (isTxLoading || !hasValidCalldata) {
+    if (isTxLoading || !hasValidCalldata || !tx) {
       return
     }
 
     const id = generateUUID()
-    createHistoryItem(id, tx!.input)
+    createHistoryItem(id, tx.calldata, tx)
     router.push(`/i/${id}`)
   }
   return (
