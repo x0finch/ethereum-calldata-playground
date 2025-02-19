@@ -92,11 +92,11 @@ export function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-6)}`
 }
 
-const HUMAN_READABLE_ABI_PATTERN =
-  /(?:function\s+[\w]+\([\w\s,]*\))|(?:event\s+[\w]+\([\w\s,]*\))|(?:\b[\w]+\([\w\s,]*\))/g
+const HUMAN_READABLE_ABI_PATTERN = /\b\w+\(.*?\)\s/g
 
 export function parseHumanReadableFunctions(abi: string) {
-  const matches = abi.split("\n") //abi.match(HUMAN_READABLE_ABI_PATTERN)
+  const abiWithSpaces = `${abi} `
+  const matches = abiWithSpaces.match(HUMAN_READABLE_ABI_PATTERN)
 
   if (!matches?.length) {
     return []
@@ -115,12 +115,13 @@ export function parseHumanReadableFunctions(abi: string) {
 }
 
 export async function tryParseJsonlikeAbi(input: string) {
-  const isJsonArray = input.startsWith("[") && input.endsWith("]")
+  const trimmedInput = input.trim()
+  const isJsonArray = trimmedInput.startsWith("[") && trimmedInput.endsWith("]")
   if (!isJsonArray) {
     return null
   }
 
-  const jsonlikeInput = JSON.parse(input)
+  const jsonlikeInput = JSON.parse(trimmedInput)
 
   if (!Array.isArray(jsonlikeInput)) {
     return null
