@@ -1,4 +1,5 @@
-import { formatUnits, parseUnits } from "viem"
+import { formatAbi } from "abitype"
+import { Abi, formatUnits, parseAbi, parseAbiItem, parseUnits } from "viem"
 
 export function generateUUID(): string {
   return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, (c) => {
@@ -89,4 +90,59 @@ export function transformEthUnit(value: string, from: EthUnit, to: EthUnit) {
 
 export function shortAddress(address: string) {
   return `${address.slice(0, 6)}...${address.slice(-6)}`
+}
+
+const HUMAN_READABLE_ABI_PATTERN =
+  /(?:function\s+[\w]+\([\w\s,]*\))|(?:event\s+[\w]+\([\w\s,]*\))|(?:\b[\w]+\([\w\s,]*\))/g
+
+export function parseHumanReadableFunctions(abi: string) {
+  const matches = abi.split("\n") //abi.match(HUMAN_READABLE_ABI_PATTERN)
+
+  if (!matches?.length) {
+    return []
+  }
+
+  return matches
+    .map((match) => match.trim())
+    .filter((match) => !match.startsWith("event"))
+    .map((match) => {
+      if (match.startsWith("function")) {
+        return match
+      }
+
+      return `function ${match}`
+    })
+}
+
+export async function tryParseJsonlikeAbi(input: string) {
+  const isJsonArray = input.startsWith("[") && input.endsWith("]")
+  if (!isJsonArray) {
+    return null
+  }
+
+  const jsonlikeInput = JSON.parse(input)
+
+  if (!Array.isArray(jsonlikeInput)) {
+    return null
+  }
+
+  const humanReadableAbi = formatAbi(jsonlikeInput)
+  if (humanReadableAbi.length <= 0) {
+    return null
+  }
+
+  return parseAbi(humanReadableAbi) as Abi
+}
+
+export async function tryParseHumanReadableAbi(input: string) {
+  const functions = parseHumanReadableFunctions(input)
+
+  if (!functions.length) {
+    return null
+  }
+
+  const settled = await Promise.allSettled(functions.map(parseAbiItem))
+  return settled
+    .filter((item) => item.status === "fulfilled")
+    .map((item) => item.value) as Abi
 }

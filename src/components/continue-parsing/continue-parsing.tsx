@@ -5,15 +5,21 @@ import {
   SELECTOR_LENGTH,
 } from "@/lib/parse-calldata"
 import { fetcher } from "@/lib/utils"
+import { useToast } from "@shadcn/hooks/use-toast"
 import { useQuery } from "@tanstack/react-query"
+import { formatAbiItem } from "abitype"
 import { isValidElement, ReactNode, useEffect, useMemo, useState } from "react"
 import {
   Abi,
   AbiFunction,
+  decodeFunctionData,
   encodeFunctionData,
+  getAbiItem,
+  Hex,
   parseAbi,
   toFunctionSelector,
 } from "viem"
+import { ManulInputAbiArea } from "../manul-input-abi-area"
 import { FunctionDetail, FunctionDetailParam } from "./function-detail"
 import { ParsingSkeleton } from "./parsing-skeleton"
 import { UnwrappedMultiSend } from "./unwrapped-multi-send"
@@ -42,6 +48,7 @@ export function ContinueParsing({
     queryKey: ["selectors", selector],
     queryFn: ({ signal }) => fetcher(`/api/selectors/${selector}`, { signal }),
     enabled: !existingSignature,
+    retry: false,
   })
   const [selectedSignature, selectedAbi] = useMemo(() => {
     if (!existingSignature && !signatures.length) {
@@ -138,7 +145,7 @@ export function ContinueParsing({
   }
 
   if (!wrappedDetail) {
-    return null
+    return <WrappedManulInputAbi historyId={historyId} calldata={calldata} />
   }
 
   return <FunctionDetail {...wrappedDetail} onParamsChange={onParamsChange} />
@@ -183,4 +190,55 @@ function wrapParams(
       ) : undefined,
     }
   })
+}
+
+function WrappedManulInputAbi({
+  historyId,
+  calldata,
+}: {
+  historyId: string
+  calldata: string
+}) {
+  const { applySignature } = useHistory()
+  const { toast } = useToast()
+  const selector = calldata.slice(0, SELECTOR_LENGTH)
+
+  const onAbiSubmit = (abi: Abi) => {
+    const abiItem = getAbiItem({ abi, name: selector })
+    if (!abiItem) {
+      toast({
+        title: "Invalid ABI",
+        description: `No function matched ${selector} found from the input`,
+      })
+      return
+    }
+    const humanReadableFunction = formatAbiItem(abiItem)
+
+    try {
+      decodeFunctionData({
+        abi: [abiItem],
+        data: calldata as Hex,
+      })
+      applySignature(
+        historyId,
+        selector,
+        humanReadableFunction.replace("function", "").trim()
+      )
+    } catch (err) {
+      const errorDescription = `'${humanReadableFunction}' can't not decode the calldata`
+
+      toast({
+        title: "Invalid ABI",
+        description: errorDescription,
+      })
+
+      console.error(errorDescription, err)
+    }
+  }
+
+  return (
+    <div className="py-4">
+      <ManulInputAbiArea onAbiSubmit={onAbiSubmit} />
+    </div>
+  )
 }
