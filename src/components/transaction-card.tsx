@@ -40,14 +40,13 @@ export function TransactionCard() {
   })
 
   const functionName = useMemo(() => {
-    if (!existingSignature && signatures.length === 0) {
+    const siganature = existingSignature || signatures?.[0]
+
+    if (!siganature) {
       return null
     }
 
-    return (existingSignature || signatures[0]).slice(
-      0,
-      signatures[0].indexOf("(")
-    )
+    return siganature.slice(0, siganature.indexOf("("))
   }, [existingSignature, signatures])
 
   if (!context) {
@@ -103,9 +102,7 @@ export function TransactionCard() {
         <div className="w-min flex flex-row gap-2 items-center my-2 ml-[150px]">
           <ArrowDown className="w-4 h-4" />
           {etherValue && (
-            <Badge className="whitespace-nowrap rounded-2xl">
-              {etherValue} Ether
-            </Badge>
+            <Badge className="whitespace-nowrap">{etherValue} Ether</Badge>
           )}
         </div>
         <div className="max-w-full flex flex-row flex-wrap items-baseline">
