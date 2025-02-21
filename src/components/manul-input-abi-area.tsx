@@ -77,13 +77,12 @@ export function ManulInputAbiArea({
       {!inputHidden && (
         <div className="absolute bottom-4 right-4 flex flex-col gap-1">
           <Button
-            variant="outline"
             size="icon"
             onClick={() => setInputHidden(true)}
           >
             <X className="w-4 h-4" color="red" />
           </Button>
-          <Button variant="outline" size="icon" onClick={onSubmit}>
+          <Button  size="icon" onClick={onSubmit}>
             <Check className="w-4 h-4" color="green" />
           </Button>
         </div>

@@ -24,7 +24,6 @@ export function SolidityTypeSensitivedInput({
       <div className="flex flex-row items-center gap-2 self-end">
         <Button
           size="icon"
-          variant="outline"
           className="hover:bg-emerald-500 hover:text-background"
           onClick={() => onChangeSubmit(value)}
         >
@@ -32,7 +31,6 @@ export function SolidityTypeSensitivedInput({
         </Button>
         <Button
           size="icon"
-          variant="outline"
           className="hover:bg-destructive hover:text-background"
           onClick={onCancel}
         >

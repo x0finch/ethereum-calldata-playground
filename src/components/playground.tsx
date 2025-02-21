@@ -37,7 +37,6 @@ export function Playground() {
         {hasEdited && (
           <div className="absolute bottom-0 right-0">
             <Badge
-              variant="outline"
               className="bg-yellow-500 text-white border-none"
             >
               Edited
