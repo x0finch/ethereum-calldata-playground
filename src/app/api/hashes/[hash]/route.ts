@@ -5,6 +5,7 @@ export interface TxResponse {
   from: Address
   to: Address
   calldata: Hex
+  value: Hex
 }
 
 export async function GET(
@@ -16,8 +17,8 @@ export async function GET(
   try {
     const tx = await getTxFromTenderly(hash)
     if (tx) {
-      const { hash, from, to, input: calldata } = tx
-      return Response.json({ hash, from, to, calldata }, { status: 200 })
+      const { hash, from, to, input: calldata, value } = tx
+      return Response.json({ hash, from, to, calldata, value }, { status: 200 })
     }
   } catch {
     // do nothing
@@ -27,10 +28,11 @@ export async function GET(
 }
 
 interface TenderlyTransaction {
-  hash: string
-  from: string
-  to: string
-  input: string
+  hash: Hex
+  from: Address
+  to: Address
+  input: Hex
+  value: Hex
 }
 
 async function getTxFromTenderly(hash: string) {

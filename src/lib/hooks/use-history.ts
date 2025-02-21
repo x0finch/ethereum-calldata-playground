@@ -8,7 +8,8 @@ export interface TxContext {
   hash: Hex
   from: Address
   to: Address
-  calldata: string
+  calldata: Hex
+  value: Hex
 }
 
 export interface HistoryItem {
