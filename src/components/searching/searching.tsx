@@ -41,10 +41,11 @@ export function Searching() {
 
   return (
     <Popover open={openSuggestions} onOpenChange={setOpenSuggestions}>
-      <PopoverAnchor className="w-full max-w-4xl mb-8">
+      <PopoverAnchor className="mb-12">
         <Input
+          className="w-full h-16 border-4 p-2 md:p-4 rotate-1 text-sm md:text-lg shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] focus-visible:ring-0 focus-visible:ring-offset-0"
           ref={searchRef}
-          placeholder="Input any calldata or transaction hash here"
+          placeholder="Any Calldata or Transaction Hash"
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
