@@ -10,7 +10,7 @@ import { useSelectedHistoryItem } from "./selected-history-provider"
 
 export function Playground() {
   const { historyId, historyItem } = useSelectedHistoryItem()
-  const {  updateCalldata } = useHistory()
+  const { updateCalldata } = useHistory()
 
   if (!historyItem) {
     return null
@@ -22,7 +22,7 @@ export function Playground() {
   return (
     <Card
       className={cn(
-        "bg-bw border-4 flex flex-col px-6 py-4 overflow-auto relative min-w-0",
+        "bg-bw border-4 flex flex-col p-4 relative",
         hasEdited &&
           "border-yellow-500 shadow-yellow-500 shadow-[4px_4px_0px_0px]"
       )}
@@ -36,9 +36,7 @@ export function Playground() {
         />
         {hasEdited && (
           <div className="absolute bottom-0 right-0">
-            <Badge
-              className="bg-yellow-500 text-white border-none"
-            >
+            <Badge className="bg-yellow-500 text-white border-none">
               Edited
             </Badge>
           </div>

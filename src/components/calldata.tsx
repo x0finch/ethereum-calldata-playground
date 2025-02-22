@@ -55,11 +55,9 @@ export function Calldata({ calldata }: { calldata: string }) {
   }
 
   return (
-    <div className="mb-4 w-[calc(100%+0.5rem)]">
+    <div className="mb-8 w-[calc(100%+0.5rem)]">
       <ScrollArea className="h-28 pr-2">
-        <div className="text-sm font-mono break-all text-muted-foreground">
-          {calldata}
-        </div>
+        <div className="break-all font-mono">{calldata}</div>
       </ScrollArea>
       <div className="w-min mt-4 flex flex-row gap-2 ">
         <Button onClick={onCopyClick}>

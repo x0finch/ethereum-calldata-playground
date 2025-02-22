@@ -2,6 +2,7 @@ import {
   MultiSendTransaction,
   parseGnosisSafeMultiSend,
 } from "@/lib/parse-calldata"
+import { Badge } from "@shadcn/components/ui/badge"
 import Link from "next/link"
 import { ReactNode, useMemo } from "react"
 import { formatEther } from "viem"
@@ -34,7 +35,7 @@ export function UnwrappedMultiSend({
   }
 
   return (
-    <SimpleTree parent={<div>transactions</div>}>
+    <SimpleTree parent={<div className="font-bold text-lg">transactions</div>}>
       {transactions.map((transaction, index) => (
         <ContinueParsing
           key={index}
@@ -57,20 +58,19 @@ function WrappedCall({
   }, [value])
 
   return (
-    <div className="flex items-center gap-1">
-      <span className="text-gray-500">Call</span>
-      <div>
-        <Link
-          href={`https://blockscan.com/address/${toAddress}`}
-          target="_blank"
-          className="text-blue-500 underline"
-        >
-          {toAddress.slice(0, 8)}...{toAddress.slice(-8)}
-        </Link>
+    <div className="flex items-baseline flex-wrap w-full max-w-full">
+      <Link
+        href={`https://blockscan.com/address/${toAddress}`}
+        target="_blank"
+        className="text-base font-base font-mono cursor-pointer hover:underline overflow-hidden text-ellipsis leading-none"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {toAddress}
+      </Link>
+      <span className="font-bold italic text-base underline underline-offset-2 leading-none mr-1">
         .{name}
-      </div>
-      <span className="text-gray-500">with</span>
-      <span>{valueInEther} ETH</span>
+      </span>
+      <Badge>{valueInEther} Ether</Badge>
     </div>
   )
 }

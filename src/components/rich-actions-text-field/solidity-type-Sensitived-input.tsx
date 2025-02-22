@@ -15,7 +15,7 @@ export function SolidityTypeSensitivedInput({
   const [value, setValue] = useState(initValue)
 
   return (
-    <div className="flex flex-col mr-2">
+    <div className="flex flex-col mr-2" onClick={(e) => e.stopPropagation()}>
       <Textarea
         className="w-96 h-20 mt-2 mb-2 text-2xl"
         value={value}

@@ -1,7 +1,7 @@
 import { useToast } from "@shadcn/hooks/use-toast"
-import { ChevronDown, ChevronRight } from "lucide-react"
+import { cn } from "@shadcn/lib/utils"
+import { Minus, Plus } from "lucide-react"
 import { isValidElement, ReactNode, useMemo, useState } from "react"
-import { RichActionsTextField } from "../rich-actions-text-field"
 
 export interface FunctionDetailParam {
   index?: string
@@ -81,20 +81,24 @@ export function FunctionDetail({
   }
 
   return (
-    <div className="ml-5">
-      <SimpleTree parent={<FunctionRow name={name} />}>
-        {indexedParams.map((param) => (
+    <SimpleTree parent={<FunctionRow name={name} />}>
+      {indexedParams.length <= 0 && (
+        <li>
+          <div className="text-base italic">No Parameter</div>
+        </li>
+      )}
+      {indexedParams.length > 0 &&
+        indexedParams.map((param) => (
           <li key={param.index}>
             <ParamRow {...param} onParamChange={onParamChange} />
           </li>
         ))}
-      </SimpleTree>
-    </div>
+    </SimpleTree>
   )
 }
 
 function FunctionRow({ name }: Pick<FunctionDetailProps, "name">) {
-  return <div className="font-semibold mr-2">{name}</div>
+  return <div className="font-bold text-lg max-w-full">{name}</div>
 }
 
 function SimpleParamRow({
@@ -107,14 +111,18 @@ function SimpleParamRow({
   onParamChange: (index: string, value: string) => void
 }) {
   return (
-    <div className="flex items-center">
-      <span className="font-semibold mr-2">{name ?? "unknown"}:</span>
-      <RichActionsTextField
-        className="mr-2 font-mono break-all"
+    <div className="flex items-center w-full overflow-clip">
+      <span className="text-lg font-bold mr-3">{name ?? "unknown"}:</span>
+      {/* <RichActionsTextField
+        className="mr-2 font-mono text-lg overflow-clip text-ellipsis max-w-full"
         value={value}
         onChange={(value) => index && onParamChange(index, value)}
-      />
-      <span className="text-sm bg-gray-200 rounded px-1 font-mono">{type}</span>
+      /> */}
+      <div className="font-mono text-lg overflow-clip text-ellipsis max-w-[calc(100%-100px)]">
+        {value}
+      </div>
+
+      <span className="ml-2 text-sm bg-bg rounded px-1 font-mono">{type}</span>
     </div>
   )
 }
@@ -149,7 +157,10 @@ function ParamRow({
   )
 }
 
-function Chevron({
+/**
+ * @deprecated
+ */
+function OpenFlag({
   isOpen,
   onClick,
 }: {
@@ -159,9 +170,9 @@ function Chevron({
   return (
     <div onClick={onClick} className="cursor-pointer mr-1 pt-1">
       {isOpen ? (
-        <ChevronDown className="w-4 h-4" />
+        <Minus className="w-6 h-6" strokeWidth={4} strokeLinecap="square" />
       ) : (
-        <ChevronRight className="w-4 h-4" />
+        <Plus className="w-6 h-6" strokeWidth={4} strokeLinecap="square" />
       )}
     </div>
   )
@@ -179,11 +190,19 @@ export function SimpleTree({
 
   return (
     <ul>
-      <li className="flex items-center cursor-default -ml-5">
-        <Chevron isOpen={isOpen} onClick={toggleOpen} />
+      <li
+        className={cn("flex items-center cursor-pointer", !isOpen && "mb-2")}
+        onClick={() => toggleOpen()}
+      >
         {parent}
       </li>
-      {isOpen && <ul className="mt-1 -ml-3 border-l pl-8">{children}</ul>}
+      <li className="pl-[2px]">
+        {isOpen && (
+          <ul className="pl-6 py-2 border-l-4 border-border border-dotted mb-1">
+            {children}
+          </ul>
+        )}
+      </li>
     </ul>
   )
 }

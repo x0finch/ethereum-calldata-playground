@@ -10,6 +10,7 @@ import { Skeleton } from "@shadcn/components/ui/skeleton"
 import { ToastAction } from "@shadcn/components/ui/toast"
 import { useToast } from "@shadcn/hooks/use-toast"
 import { cn } from "@shadcn/lib/utils"
+import { useMediaQuery } from "@uidotdev/usehooks"
 import { Trash } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -48,24 +49,33 @@ function HistoryListSkeleton() {
 
 function NoHistory() {
   return (
-    <div className="w-full h-full flex justify-center items-center text-2xl font-bold rotate-[6deg]">
+    <div className="w-full h-full flex justify-center items-center text-2xl font-bold rotate-[6deg] py-12">
       Nothing
     </div>
   )
 }
 
 function HistoryListContent({ histories }: { histories: HistoryItem[] }) {
-  return (
-    <ScrollArea className="h-max md:h-full">
+  const isMobile = useMediaQuery("(max-width: 768px)")
+
+  const children = (
+    <>
       {histories.map((historyItem) => (
         <HistoryItemView key={historyItem.id} {...historyItem} />
       ))}
-    </ScrollArea>
+    </>
+  )
+
+  return isMobile ? (
+    <div className="flex flex-col gap-2">{children}</div>
+  ) : (
+    <ScrollArea className="h-max md:h-full">{children}</ScrollArea>
   )
 }
 
 function HistoryItemView({ id, calldata, signatures, updatedAt }: HistoryItem) {
   const router = useRouter()
+  const isMobile = useMediaQuery("(max-width: 768px)")
 
   const { toast } = useToast()
   const { historyId: selectedHistoryId } = useSelectedHistoryItem()
@@ -118,21 +128,25 @@ function HistoryItemView({ id, calldata, signatures, updatedAt }: HistoryItem) {
     <Link
       href={`/i/${id}`}
       className={cn(
-        "flex flex-col px-4 py-2 cursor-pointer hover:bg-bg group",
+        "flex flex-col px-4 py-2 cursor-pointer hover:bg-bg group max-w-full",
         isSelected && "bg-main hover:bg-main",
         isDeleting && "hidden"
       )}
     >
-      <div className="flex flex-row items-center pr-2">
-        <div className="flex-1 font-bold overflow-hidden text-ellipsis">
+      <div className="flex flex-row items-center">
+        <div className="font-bold overflow-hidden text-ellipsis max-w-[calc(100%-50px)]">
           {functionName ?? selector}
         </div>
+        <div className="flex-1" />
 
         <Button
           id="remove-history-item"
           size="icon"
           variant="neutral"
-          className="w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 ml-4"
+          className={cn(
+            "w-8 h-8 rounded-full opacity-0 group-hover:opacity-100 ml-4",
+            isMobile && "opacity-100"
+          )}
           onClick={onDelete}
         >
           <Trash />

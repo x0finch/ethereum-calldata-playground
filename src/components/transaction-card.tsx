@@ -91,11 +91,11 @@ export function TransactionCard() {
 
       <div className="w-full border-t-4 border-border border-dotted mt-4 mb-8" />
 
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col gap-2 max-w-full">
         <Link
           href={`https://blockscan.com/address/${from}`}
           target="_blank"
-          className="font-bold cursor-pointer w-min hover:underline"
+          className="font-bold cursor-pointer w-min hover:underline max-w-full overflow-hidden text-ellipsis"
         >
           {from}
         </Link>
@@ -109,7 +109,7 @@ export function TransactionCard() {
           <Link
             href={`https://blockscan.com/address/${to}`}
             target="_blank"
-            className="font-bold cursor-pointer w-min hover:underline"
+            className="font-bold cursor-pointer w-min hover:underline overflow-hidden text-ellipsis"
           >
             {to}
           </Link>

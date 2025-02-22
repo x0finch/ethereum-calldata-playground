@@ -4,7 +4,7 @@ import { tryParseHumanReadableAbi, tryParseJsonlikeAbi } from "@/lib/utils"
 import { Button } from "@shadcn/components/ui/button"
 import { Textarea } from "@shadcn/components/ui/textarea"
 import { useToast } from "@shadcn/hooks/use-toast"
-import { Check, Pointer, X } from "lucide-react"
+import { Check, X } from "lucide-react"
 import { useState } from "react"
 import { Abi } from "viem"
 
@@ -54,35 +54,37 @@ export function ManulInputAbiArea({
 
   return (
     <div
-      className="w-full max-w-96 h-40 border-2 border-dashed rounded p-4 flex flex-col justify-center items-center cursor-pointer relative"
+      className="max-w-96 h-36 relative"
       onClick={() => inputHidden && setInputHidden(!inputHidden)}
     >
       {!inputHidden ? (
         <Textarea
-          className="w-full h-full"
-          placeholder="Please input ABI likes json format or function definition"
+          className="w-full h-full max-w-full max-h-full"
+          placeholder={`Please input ABI likes:
+1. Json Array Format
+2. Human Readable Function Definition`}
           value={input}
           onChange={(e) => setInput(e.target.value)}
         />
       ) : (
-        <div className="flex flex-col items-center justify-center">
-          <div className="text-sm text-muted-foreground text-center">
-            Sorry, we don't have ABI matching this calldata,
+        <div className="h-full w-full flex flex-col justify-center items-center cursor-pointer border-4 border-dashed">
+          <div className="text-sm text-center font-bold">
+            Sorry, we don't have ABI matched,
             <br />
-            you can click here to input ABI manually
+            Click here to input ABI manually
           </div>
-          <Pointer className="text-muted-foreground/30 mt-2" />
         </div>
       )}
       {!inputHidden && (
-        <div className="absolute bottom-4 right-4 flex flex-col gap-1">
+        <div className="absolute bottom-3 right-3 flex flex-col gap-2">
           <Button
             size="icon"
             onClick={() => setInputHidden(true)}
+            variant="neutral"
           >
             <X className="w-4 h-4" color="red" />
           </Button>
-          <Button  size="icon" onClick={onSubmit}>
+          <Button size="icon" onClick={onSubmit}>
             <Check className="w-4 h-4" color="green" />
           </Button>
         </div>

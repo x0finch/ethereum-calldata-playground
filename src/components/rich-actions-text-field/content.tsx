@@ -1,4 +1,3 @@
-import { cn } from "@shadcn/lib/utils"
 import React, { useMemo } from "react"
 
 interface ContentProps {
@@ -22,14 +21,7 @@ export const Content = React.forwardRef(
     }, [children])
 
     return (
-      <div
-        ref={ref}
-        className={cn(
-          "cursor-pointer hover:bg-muted-foreground/10 px-1",
-          className
-        )}
-        {...rest}
-      >
+      <div ref={ref} className={className} {...rest}>
         {shortedChildren}
       </div>
     )

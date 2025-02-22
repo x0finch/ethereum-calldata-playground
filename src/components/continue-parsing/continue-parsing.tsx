@@ -236,9 +236,5 @@ function WrappedManulInputAbi({
     }
   }
 
-  return (
-    <div className="py-4">
-      <ManulInputAbiArea onAbiSubmit={onAbiSubmit} />
-    </div>
-  )
+  return <ManulInputAbiArea onAbiSubmit={onAbiSubmit} />
 }
