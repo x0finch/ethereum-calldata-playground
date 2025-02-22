@@ -20,7 +20,11 @@ export function Suggestions({ searchTerm }: { searchTerm: string }) {
   const isSearchInvalid = !mayBeTxHash && !mayBeCalldata
 
   return (
-    <PopoverContent className="w-screen max-w-4xl" side="bottom" align="start">
+    <PopoverContent
+      className="w-[calc(100vw-6rem)] lg:w-screen lg:max-w-[50rem] lg:ml-1 mt-2"
+      side="bottom"
+      align="start"
+    >
       <div className=" flex flex-col">
         {isSearchInvalid && (
           <div className="text-sm text-muted-foreground">
