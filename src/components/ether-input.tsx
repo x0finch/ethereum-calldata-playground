@@ -3,6 +3,7 @@ import { Input } from "@shadcn/components/ui/input"
 import {
   Select,
   SelectContent,
+  SelectGroup,
   SelectItem,
   SelectTrigger,
   SelectValue,
@@ -79,19 +80,21 @@ function UnitSelect({
       <SelectTrigger
         className={cn(
           className,
-          "absolute right-2 size-min flex justify-center items-center py-0 px-2 rounded-md bg-foreground text-background [&>.lucide-chevron-down]:hidden"
+          "absolute right-2 size-min flex justify-center items-center py-0 px-2 [&>.lucide-chevron-down]:hidden"
         )}
       >
         <SelectValue>
           {UNIT_OPTIONS.find((option) => option.value === value)?.label}
         </SelectValue>
       </SelectTrigger>
-      <SelectContent>
-        {UNIT_OPTIONS.map((option) => (
-          <SelectItem key={option.value} value={option.value}>
-            {option.label}
-          </SelectItem>
-        ))}
+      <SelectContent side="top">
+        <SelectGroup>
+          {UNIT_OPTIONS.map((option) => (
+            <SelectItem key={option.value} value={option.value}>
+              {option.label}
+            </SelectItem>
+          ))}
+        </SelectGroup>
       </SelectContent>
     </Select>
   )
