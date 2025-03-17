@@ -1,3 +1,4 @@
+import { ScrollArea } from "@shadcn/components/ui/scroll-area"
 import { useToast } from "@shadcn/hooks/use-toast"
 import { cn } from "@shadcn/lib/utils"
 import { Minus, Plus } from "lucide-react"
@@ -110,6 +111,13 @@ function SimpleParamRow({
 }: FunctionDetailProps["params"][0] & {
   onParamChange: (index: string, value: string) => void
 }) {
+  let valueNode = <div className="font-mono text-lg w-full ">{value}</div>
+  if (value.length > 200) {
+    valueNode = (
+      <ScrollArea className="w-full h-[100px] pr-1">{valueNode}</ScrollArea>
+    )
+  }
+
   return (
     <div className="flex items-center w-full overflow-clip">
       <span className="text-lg font-bold mr-3">{name ?? "unknown"}:</span>
@@ -118,10 +126,7 @@ function SimpleParamRow({
         value={value}
         onChange={(value) => index && onParamChange(index, value)}
       /> */}
-      <div className="font-mono text-lg overflow-clip text-ellipsis max-w-[calc(100%-100px)]">
-        {value}
-      </div>
-
+      <div className="max-w-[calc(100%-100px)] break-all">{valueNode}</div>
       <span className="ml-2 text-sm bg-bg rounded px-1 font-mono">{type}</span>
     </div>
   )
